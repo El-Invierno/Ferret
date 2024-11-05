@@ -17,7 +17,7 @@ load_dotenv()
 # Initialize model
 model = ChatOpenAI(model='gpt-4o', temperature=0)
 
-# Define the LlamaParse instance with the appropriate parsing instructions
+# Define the LlamaParse instances with the appropriate parsing instructions
 resume_parser = LlamaParse(
     parsing_instruction='''
         You are parsing a resume. Try to get all the important text data from the resume.
@@ -27,8 +27,16 @@ resume_parser = LlamaParse(
     show_progress=True,
 )
 
+jd_parser = LlamaParse(
+    parsing_instruction='''
+        You are parsing a job description. Try to get all the important text data from the JobDescription.
+    ''',
+    show_progress=True,
+)
+
 # File extractor for each file type
 file_extractor = {'.pdf': resume_parser}
+jd_extractor = {'.pdf': jd_parser}
 
 # Define helper functions
 def mergeDocs(documents):
@@ -107,18 +115,34 @@ def topKReranker(results, k):
     return sorted_list[:k]
 
 # Streamlit UI
-st.title("Ferret: Resume and Job Description Evaluation System")
+col1, col2 = st.columns([1, 8])
 
-st.header("Upload Job Description")
-jd_file = st.file_uploader("Choose a job description file", type=['txt'])
+with col1:
+    st.image("./images/screenshot.jpeg", width=50)  # Adjust width as needed
+
+with col2:
+    st.markdown("<h1 style='display: inline;'>Ferret: Resume and Job Description Evaluation System</h1>", unsafe_allow_html=True)
+
+st.header("Upload Job Description (PDF)")
+jd_file = st.file_uploader("Choose a job description file", type=['pdf'])
 jd_content = None
-if jd_file:
-    jd_content = jd_file.read().decode('utf-8')
 
-st.header("Upload Resumes")
+if jd_file:
+    # Create a temporary directory for the JD PDF
+    with tempfile.TemporaryDirectory() as tmp_jd_dir:
+        # Save JD PDF in the temporary directory
+        jd_path = os.path.join(tmp_jd_dir, "job_description.pdf")
+        with open(jd_path, 'wb') as f:
+            f.write(jd_file.read())
+
+        # Use SimpleDirectoryReader to read the directory containing the JD PDF
+        jd_documents = SimpleDirectoryReader(tmp_jd_dir, file_extractor=jd_extractor).load_data()
+        jd_content = mergeDocs(jd_documents).get("job_description.txt", "")
+
+st.header("Upload Resumes (PDFs)")
 resume_files = st.file_uploader("Choose resume files", type=['pdf'], accept_multiple_files=True)
 
-temp_dir = tempfile.mkdtemp()  # Create a temporary directory
+temp_dir = tempfile.mkdtemp()  # Create a temporary directory for resumes
 
 # Save uploaded resumes to the temporary directory
 for resume_file in resume_files:
