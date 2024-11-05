@@ -148,20 +148,20 @@ def topKReranker(results,k):
 def main():
     '''Parsing the resumes.'''
 
-    # documents = SimpleDirectoryReader(
-    #     './jobData/Resumes/normal_data/ResumePdfs',
-    #     file_extractor=file_extractor,
-    # ).load_data()
-    # mergedDict = mergeDocs(documents) # Merge the documents into a dict.
-    # createFiles(mergedDict,'./jobData/Resumes/final_data/') # Create .txt files for each resume.
+    documents = SimpleDirectoryReader(
+        './jobData/Resumes/normal_data/ResumePdfs',
+        file_extractor=file_extractor1,
+    ).load_data()
+    mergedDict = mergeDocs(documents) # Merge the documents into a dict.
+    createFiles(mergedDict,'./jobData/Resumes/final_data/') # Create .txt files for each resume.
 
     '''Parsing the JD.'''
-    # jdDoc = SimpleDirectoryReader(
-    #     './jobData/JDs/glean_jd',
-    #     file_extractor=file_extractor2
-    # ).load_data()
-    # mergedJD = mergeDocs(jdDoc)
-    # createFiles(mergedJD,'./jobData/JDs/final_data/')
+    jdDoc = SimpleDirectoryReader(
+        './jobData/JDs/glean_jd',
+        file_extractor=file_extractor2
+    ).load_data()
+    mergedJD = mergeDocs(jdDoc)
+    createFiles(mergedJD,'./jobData/JDs/final_data/')
 
     results = compareEvaluate()
     final_results = topKReranker(results,10)
