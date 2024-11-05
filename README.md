@@ -1,4 +1,6 @@
-## Ferret - The one stop scout for resume - jobDesciption matching. [Powered by Langchain and GENAI].
+<img src="images/screenshot.png" alt="Screenshot of Ferret" width="200"/>
+
+## Ferret - The one stop scout for "Resume - JobDesciption" matching. [Powered by Langchain and GENAI].
 
 Goal of the Project The goal of Ferret is to automate the process of parsing resumes and job descriptions, extracting relevant information, and evaluating how well each resume matches a given job description. This system is intended to assist recruiters in identifying top candidates by analyzing essential skills, experience, and qualifications through a streamlined, automated process.
 
