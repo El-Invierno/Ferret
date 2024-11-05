@@ -1,4 +1,4 @@
-<img src="images/screenshot.png" alt="Screenshot of Ferret" width="200"/>
+<img src="images/screenshot.jpeg" alt="Screenshot of Ferret" width="200"/>
 
 ## Ferret - The one stop scout for "Resume - JobDesciption" matching. [Powered by Langchain and LlamaParse].
 
