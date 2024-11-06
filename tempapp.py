@@ -152,8 +152,8 @@ def main():
         './jobData/Resumes/normal_data/ResumePdfs',
         file_extractor=file_extractor1,
     ).load_data()
-    mergedDict = mergeDocs(documents) # Merge the documents into a dict.
-    createFiles(mergedDict,'./jobData/Resumes/final_data/') # Create .txt files for each resume.
+    mergedResumes = mergeDocs(documents) # Merge the documents into a dict.
+    createFiles(mergedResumes,'./jobData/Resumes/final_data/') # Create .txt files for each resume.
 
     '''Parsing the JD.'''
     jdDoc = SimpleDirectoryReader(
