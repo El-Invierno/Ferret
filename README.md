@@ -2,24 +2,115 @@
 
 ## Ferret - The one stop scout for "Resume - JobDesciption" matching. [Powered by Langchain and LlamaParse].
 
-Goal of the Project The goal of Ferret is to automate the process of parsing resumes and job descriptions, extracting relevant information, and evaluating how well each resume matches a given job description. This system is intended to assist recruiters in identifying top candidates by analyzing essential skills, experience, and qualifications through a streamlined, automated process.
+Ferret is a comprehensive resume and job description (JD) evaluation system designed to streamline the hiring process. By leveraging AI-driven insights, the tool matches resumes against job descriptions based on key technical skills, qualifications, and experience. It also integrates GitHub data to enhance the evaluation of candidates with technical project experience.
 
-Key Components
-Chains and Prompts with LangChain:
+---
 
-Job Description Parsing: Using a LangChain prompt template, Ferret analyzes job descriptions to extract critical requirements such as educational background, years of experience, and essential skills. The extracted information is summarized into structured points, making it easier to use as a reference for evaluating resumes.
-Resume Parsing: A separate LangChain prompt template is applied to parse resumes. The system extracts information like the candidate's name, email, skills, years of experience, and notable project metrics. This output is structured for efficient comparison against job requirements.
-Comparison Chain: Another LangChain prompt template is used to compare parsed resume data with job description data. The system evaluates key areas such as skills match, years of experience, and relevant achievements, generating a score out of 10 based on a fixed rubric.
-Multithreading Optimization:
+## Features
 
-To handle large volumes of resumes efficiently, Ferret uses multithreading via ThreadPoolExecutor, allowing concurrent processing of resumes. This significantly speeds up the comparison and evaluation process.
-Evaluation and Ranking:
+### Resume and JD Parsing
+- Extracts key details from resumes, including:
+  - Candidate name and email.
+  - Technical skills and certifications.
+  - Projects with metrics and experience details.
+- Summarizes job descriptions to identify:
+  - Required qualifications and experience.
+  - Technical skills and mandatory/good-to-have attributes.
 
-After extracting and comparing data, the system ranks candidates by their scores and selects the top candidates who best match the job description. This list is then output, making it easy for recruiters to view the best-matched candidates.
-Key Technologies
-LangChain: Enables prompt engineering and chaining tasks, connecting language model outputs across multiple stages of parsing and comparison.
-LlamaParse: Parses resumes and job descriptions to focus on the critical data points needed for evaluation.
-OpenAI: Provides the language model for generating meaningful comparisons and extracting structured data.
-Multithreading: Used to improve performance when handling multiple resumes simultaneously.
-Outcome
-By automating resume parsing, job description analysis, and candidate evaluation, Ferret helps recruiters quickly find top matches, streamlining the hiring process and reducing the manual effort typically involved in shortlisting candidates.
+### GitHub Integration
+- Identifies GitHub links in resumes and retrieves:
+  - Repository titles.
+  - README content for project details.
+  - Languages used in projects.
+- Incorporates GitHub data into the evaluation to better assess technical expertise.
+
+### Evaluation and Scoring
+- Compares resumes with JDs based on:
+  - Skills and experience alignment.
+  - Project relevance using GitHub data.
+- Provides a score (out of 100) for each candidate.
+- Displays the top candidates based on the evaluation.
+
+### Streamlined User Interface
+- Upload job descriptions and multiple resumes in PDF format.
+- Specify the number of top candidates (K) to display.
+- Ensures user actions are responsive:
+  - "Evaluate" button activates only when all inputs are provided.
+  - Disables during evaluation to prevent duplicate submissions.
+
+---
+
+## How It Works
+
+1. **Upload Documents**:
+   - Upload the job description as a PDF.
+   - Upload multiple resumes in PDF format.
+
+2. **Parse and Merge Data**:
+   - Job descriptions and resumes are parsed for essential data.
+   - GitHub links in resumes are identified and scraped for additional insights.
+
+3. **Evaluate Resumes**:
+   - AI processes the JD and resumes to extract relevant keywords and align skills.
+   - GitHub data is analyzed to further refine the evaluation.
+
+4. **Display Results**:
+   - Top candidates are ranked and displayed with:
+     - Name, email, matched skills, and evaluation score.
+
+---
+
+## Setup Instructions
+
+### Prerequisites
+- Python 3.9 or higher.
+- Install dependencies from `requirements.txt` using `pip install -r requirements.txt`.
+- ChromeDriver installed and configured for Selenium.
+
+### Environment Variables
+Create a `.env` file with the following keys:
+```
+OPENAI_API_KEY=<your_openai_api_key>
+```
+
+### Running the Application
+1. Clone the repository.
+2. Install the required dependencies.
+3. Start the application:
+   ```bash
+   streamlit run app.py
+   ```
+
+---
+
+## Folder Structure
+
+```
+ferret/
+├── app.py                     # Main application
+├── github_scraper.py          # GitHub scraping functionality
+├── requirements.txt           # Project dependencies
+├── README.md                  # Project documentation
+├── images/
+│   └── screenshot.jpeg        # Project logo or screenshots
+├── .env                       # Environment variables (not included in version control)
+└── ...
+```
+
+---
+
+## Future Enhancements
+- Support for additional file formats like `.docx`.
+- Enhanced GitHub data analysis using project-specific metrics.
+- Integration with LinkedIn and other professional platforms.
+- Advanced analytics for hiring trends and insights.
+
+---
+
+## Contributing
+Contributions are welcome! Please fork the repository and create a pull request with your changes. Make sure to follow the coding standards and include relevant documentation.
+
+---
+
+## License
+This project is licensed under the MIT License. See the `LICENSE` file for details.
