@@ -1,6 +1,7 @@
 import os
 import re
 import ast
+import json
 import streamlit as st
 from dotenv import load_dotenv
 from llama_parse import LlamaParse
@@ -9,6 +10,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda
+from github_scraper import scrape_github_repositories
 import tempfile
 
 # Load environment variables
@@ -41,13 +43,28 @@ jd_extractor = {'.pdf': jd_parser}
 # Define helper functions
 def mergeDocs(documents):
     documents_dict = {}
+    github_link_pattern = r'(https?://)?(www\.)?github\.com/[a-zA-Z0-9_-]+(/[a-zA-Z0-9_-]+)?'
+
     for doc in documents:
         file_name = doc.metadata['file_name'].split('.')[0] + '.txt'
+        match = re.search(github_link_pattern, doc.text)
+        additional_data = ""
+
+        if match:
+            github_link = match.group(0)
+            try:
+                repo_data = scrape_github_repositories(github_link)
+                additional_data += f"\nGitHub Data for the candidate:\n{json.dumps(repo_data, indent=4)}"
+            except Exception as e:
+                additional_data += f"\nError fetching GitHub data for {github_link}: {e}"
+
         if file_name in documents_dict:
-            documents_dict[file_name] += '\n' + doc.text
+            documents_dict[file_name] += '\n' + doc.text + additional_data
         else:
-            documents_dict[file_name] = doc.text
+            documents_dict[file_name] = doc.text + additional_data
+
     return documents_dict
+
 
 def compareEvaluate(jd_content, resume_contents):
     summarizeKeywordPrompt = PromptTemplate.from_template(
@@ -56,6 +73,7 @@ def compareEvaluate(jd_content, resume_contents):
             {jobDescription}\n
             Mandatory Points to follow:
             - Understand the job role and what is the educational background required to be eligible for it.
+            - Gather the important keywords from the GitHub data, if present in the text.
             - Try to narrow down on any minimum percentage or gradepoint criteria for the educational courses.
             - Extract all the key technical keywords and skills required in the job posting.
             - Extract the number of years of experience required from the description.
@@ -92,10 +110,11 @@ def compareEvaluate(jd_content, resume_contents):
             Job Description: {Job_Desc}
             Resume Description: {Resume_Desc}
             - Evaluate the resume description using the job description as a point of reference. 
-            - The final resume evaluation score should be out of 10. The score can be a float value.
+            - The final resume evaluation score should be out of 100. The score can be a float value.
             - Score the content on the above fixed set of Rubrics.
+            - If years of experience required meet or exceed the requirement in the job description, then give additional marks.
             Output(Python List):
-            [<candidate_name>, <candidate_email>, [<matched_skillsets>], <score_out_of_10>]
+            [<candidate_name>, <candidate_email>, <years_of_exp(INT)>, [<matched_skillsets>], <score_out_of_100>]
             ** Do not output anything apart from the above output format.
         '''
     )
@@ -165,8 +184,9 @@ if st.button("Evaluate"):
         for candidate in top_candidates:
             st.write(f"Name: {candidate[0]}")
             st.write(f"Email: {candidate[1]}")
-            st.write(f"Matched Skills: {', '.join(candidate[2])}")
-            st.write(f"Score: {candidate[3]}")
+            st.write(f'Years of experience: {candidate[2]}')
+            st.write(f"Matched Skills: {', '.join(candidate[3])}")
+            st.write(f"Score: {candidate[4]}")
             st.write("---")
     else:
         st.error("Please upload both a job description and resumes.")
